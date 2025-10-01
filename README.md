@@ -1,13 +1,12 @@
 ---
-title: My Telegram Bot Space
+title: Telegram Bot + laozhang.ai
 emoji: 🤖
 colorFrom: pink
 colorTo: indigo
-sdk: fastapi
+sdk: docker
 app_file: bot.py
 pinned: false
 license: mit
-python_version: "3.9"
 ---
 
 
