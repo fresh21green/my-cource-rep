@@ -1,11 +1,22 @@
----
-title: My Course Space2
-emoji: 🐨
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-license: mit
----
+# 🤖 Telegram Bot + laozhang.ai на Hugging Face Spaces
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+Этот Space разворачивает Telegram-бота, который отвечает пользователю через API laozhang.ai.
+
+## ⚙️ Настройка
+
+1. В **Settings → Variables** добавь:
+   - `TELEGRAM_BOT_TOKEN` = токен от BotFather
+   - `LAOZHANG_API_KEY` = твой ключ laozhang.ai
+
+2. В **Settings → App file** укажи `bot.py`.  
+   Переменная в коде должна называться **app** (как у нас `app = FastAPI()`).
+
+3. После деплоя Space будет доступен по URL:
+https://<username>-<space-name>.hf.space
+
+
+
+4. Зарегистрируй webhook в Telegram:
+```bash
+curl -F "url=https://<username>-<space-name>.hf.space/webhook" \
+     https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook
