@@ -3,28 +3,22 @@ import requests
 from fastapi import FastAPI, Request
 from telegram import Update
 
-# --- Переменные окружения ---
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 LAOZHANG_API_KEY = os.getenv("LAOZHANG_API_KEY")
 
 LAOZHANG_API_URL = "https://api.laozhang.ai/v1/chat/completions"
 LAOZHANG_MODEL = "gpt-4o"
 
-# --- Telegram API ---
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
 
-# --- FastAPI app ---
 app = FastAPI()
 
-# --- функция отправки сообщений ---
 def send_message(chat_id: int, text: str):
-    """Отправляем сообщение пользователю через Telegram API"""
     requests.post(f"{TELEGRAM_API_URL}/sendMessage", json={
         "chat_id": chat_id,
         "text": text
     })
 
-# --- Webhook endpoint ---
 @app.post("/webhook")
 async def webhook(request: Request):
     data = await request.json()
@@ -32,7 +26,7 @@ async def webhook(request: Request):
 
     if update.message and update.message.text:
         user_text = update.message.text
-        chat_id = update.message.chat_id
+        chat_id = update.message.chat.id
 
         # Запрос в laozhang.ai
         headers = {
@@ -57,7 +51,6 @@ async def webhook(request: Request):
         except Exception as e:
             reply_text = f"Ошибка запроса: {e}"
 
-        # Отправляем ответ пользователю
         send_message(chat_id, reply_text)
 
     return {"ok": True}
