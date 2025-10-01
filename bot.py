@@ -13,7 +13,7 @@ LAOZHANG_MODEL = "gpt-4o"
 AMVERA_MODEL = "gpt-4.1"
 
 LAOZHANG_API_URL = "https://api.laozhang.ai/v1/chat/completions"
-AMVERA_API_URL = "https:///models/gpt"
+AMVERA_API_URL = "https://models/gpt"
 
 
 
