@@ -6,9 +6,9 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 # --- Переменные окружения ---
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-LAOZHANG_API_KEY = os.getenv("LAOZHANG_API_KEY")   # добавь в Settings → Variables
+LAOZHANG_API_KEY = os.getenv("LAOZHANG_API_KEY")
 LAOZHANG_API_URL = "https://api.laozhang.ai/v1/chat/completions"
-LAOZHANG_MODEL = "gpt-4o"  # можно заменить на "claude-3.5" и т.п.
+LAOZHANG_MODEL = "gpt-4o"
 
 # --- FastAPI app ---
 app = FastAPI()
@@ -52,6 +52,12 @@ application.add_handler(CommandHandler("start", start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat))
 
 # --- Webhook endpoint ---
+@app.on_event("startup")
+async def startup_event():
+    """Инициализируем бота при старте FastAPI"""
+    await application.initialize()
+    await application.start()
+
 @app.post("/webhook")
 async def webhook(request: Request):
     data = await request.json()
