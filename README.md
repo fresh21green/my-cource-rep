@@ -1,3 +1,17 @@
+---
+title: My Telegram Bot Space
+emoji: 🤖
+colorFrom: pink
+colorTo: indigo
+sdk: fastapi
+app_file: bot.py
+pinned: false
+license: mit
+python_version: "3.9"
+---
+
+
+
 # 🤖 Telegram Bot + laozhang.ai на Hugging Face Spaces
 
 Этот Space разворачивает Telegram-бота, который отвечает пользователю через API laozhang.ai.
