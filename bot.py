@@ -8,9 +8,12 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 LAOZHANG_API_KEY = os.getenv("LAOZHANG_API_KEY")
 AMVERA_API_KEY = os.getenv("AMVERA_API_KEY")
 
-LAOZHANG_API_URL = "https://api.laozhang.ai/v1/chat/completions"
+
 LAOZHANG_MODEL = "gpt-4o"
 AMVERA_MODEL = "gpt-4.1"
+
+LAOZHANG_API_URL = "https://api.laozhang.ai/v1/chat/completions"
+AMVERA_API_URL = "https:///models/gpt"
 
 
 
@@ -47,7 +50,7 @@ async def webhook(request: Request):
         }
 
         try:
-            resp = requests.post(LAOZHANG_API_URL, headers=headers, json=payload)
+            resp = requests.post(AMVERA_API_URL, headers=headers, json=payload),#LAOZHANG_API_URL
             if resp.status_code == 200:
                 data = resp.json()
                 reply_text = data["choices"][0]["message"]["content"]
