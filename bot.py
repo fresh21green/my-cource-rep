@@ -4,11 +4,13 @@ from fastapi import FastAPI, Request
 from telegram import Update
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
 LAOZHANG_API_KEY = os.getenv("LAOZHANG_API_KEY")
 AMVERA_API_KEY = os.getenv("AMVERA_API_KEY")
 
 LAOZHANG_API_URL = "https://api.laozhang.ai/v1/chat/completions"
 LAOZHANG_MODEL = "gpt-4o"
+AMVERA_MODEL = "gpt-4.1"
 
 
 
@@ -33,11 +35,11 @@ async def webhook(request: Request):
 
         # Запрос в laozhang.ai
         headers = {
-            "Authorization": f"Bearer {AMVERA_API_KEY}",
+            "Authorization": f"Bearer {AMVERA_API_KEY}",#LAOZHANG_API_KEY
             "Content-Type": "application/json"
         }
         payload = {
-            "model": LAOZHANG_MODEL,
+            "model": AMVERA_MODEL,#LAOZHANG_MODEL
             "messages": [
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": user_text}
