@@ -3,6 +3,17 @@ import requests
 from fastapi import FastAPI, Request
 from telegram import Update
 
+#Подключаем Amvera адаптер
+from langchain_amvera import AmveraLLM
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Поддерживаемые модели: llama8b, llama70b, gpt-4.1, gpt-5
+llm = AmveraLLM(model="llama70b", api_token=os.getenv("AMVERA_API_TOKEN"))
+
+
+
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 LAOZHANG_API_KEY = os.getenv("LAOZHANG_API_KEY")
@@ -36,28 +47,34 @@ async def webhook(request: Request):
         user_text = update.message.text
         chat_id = update.message.chat.id
 
-        # Запрос в laozhang.ai
-        headers = {
-            "Authorization": f"Bearer {AMVERA_API_KEY}",#LAOZHANG_API_KEY
-            "Content-Type": "application/json"
-        }
-        payload = {
-            "model": AMVERA_MODEL,#LAOZHANG_MODEL
-            "messages": [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": user_text}
-            ]
-        }
 
-        try:
-            resp = requests.post(AMVERA_API_URL, headers=headers, json=payload),#LAOZHANG_API_URL
-            if resp.status_code == 200:
-                data = resp.json()
-                reply_text = data["choices"][0]["message"]["content"]
-            else:
-                reply_text = f"Ошибка API: {resp.text}"
-        except Exception as e:
-            reply_text = f"Ошибка запроса: {e}"
+
+        # Запрос в laozhang.ai
+        # headers = {
+        #     "Authorization": f"Bearer {LAOZHANG_API_KEY}",#LAOZHANG_API_KEY
+        #     "Content-Type": "application/json"
+        # }
+        # payload = {
+        #     "model": LAOZHANG_MODEL,#LAOZHANG_MODEL
+        #     "messages": [
+        #         {"role": "system", "content": "You are a helpful assistant."},
+        #         {"role": "user", "content": user_text}
+        #     ]
+        # }
+
+        # try:
+        #     resp = requests.post(LAOZHANG_API_URL, headers=headers, json=payload),#LAOZHANG_API_URL
+        #     if resp.status_code == 200:
+        #         data = resp.json()
+        #         reply_text = data["choices"][0]["message"]["content"]
+        #     else:
+        #         reply_text = f"Ошибка API: {resp.text}"
+        # except Exception as e:
+        #     reply_text = f"Ошибка запроса: {e}"
+
+        # Запрос в amvera
+        resp = llm.invoke("Объясни принципы работы нейросетей простым языком")
+        reply_text = resp.content
 
         send_message(chat_id, reply_text)
 
