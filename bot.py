@@ -61,7 +61,7 @@ async def create_new_instance():
         return resp.json()
 
 # команда /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE): 
     keyboard = [
         [InlineKeyboardButton("🚀 Клонировать", callback_data="clone")]
     ]
@@ -92,7 +92,7 @@ async def webhook(request: Request):
     if update.message and update.message.text:
         user_text = update.message.text
         chat_id = update.message.chat.id 
-        resp = llm.invoke("Объясни принципы работы нейросетей простым языком")
+        resp = llm.invoke(user_text)
         reply_text = resp.content
 
         send_message(chat_id, reply_text)
