@@ -18,7 +18,7 @@ load_dotenv()
 
 AMVERA_API_KEY = os.getenv("AMVERA_API_KEY")
 AMVERA_MODEL = "gpt-4.1"
-AMVERA_API_URL = "https://models/gpt"
+# AMVERA_API_URL = "https://models/gpt"
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
@@ -58,6 +58,8 @@ async def create_new_instance():
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(RENDER_API_URL, headers=headers, json=payload)
+        if resp.status_code != 201:
+            return {"error": resp.text}
         return resp.json()
 
 # команда /start
@@ -68,35 +70,41 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Привет! Нажми кнопку, чтобы клонировать бота:", reply_markup=reply_markup)
 
-
-# обработчик кнопки
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    if query.data == "clone":
-        result = await create_new_instance()
-        await query.edit_message_text(text=f"✅ Новый инстанс создан!\n\n{result}")
-
-
-
 @app.post("/webhook")
 async def webhook(request: Request):
     data = await request.json()
-    
     update = Update.de_json(data, None)
-    if update.message.text == "/clone":
-        create_new_instance()
-        return "Создан новый бот на Render 🚀"
-    
+
+    # обработка кнопки /start
+    if update.message.text == "/start":
+        chat_id = update.message.chat.id
+        keyboard = [[InlineKeyboardButton("🚀 Клонировать", callback_data="clone")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        send_message(chat_id, "Привет! Нажми кнопку, чтобы клонировать бота:")
+        return {"ok": True}
+
+    # обработка кнопки clone
+    if update.callback_query:
+        if update.callback_query.data == "clone":
+            result = await create_new_instance()
+            chat_id = update.callback_query.message.chat.id
+            send_message(chat_id, f"✅ Новый инстанс создан!\n\n{result}")
+        return {"ok": True}
+
+    # обработка команд clone
     if update.message and update.message.text:
+        if update.message.text == "/clone":
+            result = await create_new_instance()
+            send_message(update.message.chat.id, f"✅ Новый инстанс создан!\n\n{result}")
+            return {"ok": True}
+
         user_text = update.message.text
         chat_id = update.message.chat.id 
+
         resp = llm.invoke(user_text)
-        reply_text = resp.content
+        reply_text = str(resp)  # на всякий случай
 
         send_message(chat_id, reply_text)
-
         # Запрос в laozhang.ai
         # headers = {
         #     "Authorization": f"Bearer {LAOZHANG_API_KEY}",#LAOZHANG_API_KEY
