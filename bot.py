@@ -45,7 +45,7 @@ async def webhook(request: Request):
 
     if update.message and update.message.text:
         user_text = update.message.text
-        chat_id = update.message.chat.id
+        chat_id = update.message.chat.id 
 
 
 
