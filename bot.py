@@ -1,7 +1,7 @@
 import os
 import requests
 from fastapi import FastAPI, Request
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 #Подключаем Amvera адаптер
 from langchain_amvera import AmveraLLM
@@ -15,7 +15,7 @@ load_dotenv()
 
 AMVERA_API_KEY = os.getenv("AMVERA_API_KEY")
 AMVERA_MODEL = "gpt-4.1"
-AMVERA_API_URL = "https://models/gpt"
+# AMVERA_API_URL = "https://models/gpt"
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
@@ -24,6 +24,14 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
 llm = AmveraLLM(model="gpt-4.1", api_token=AMVERA_API_KEY)
 
 app = FastAPI()
+
+
+def start(update, context):
+    keyboard = [
+        [InlineKeyboardButton("Сайт", url="https://python.org")],
+        [InlineKeyboardButton("Нажми меня", callback_data="press")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
 def send_message(chat_id: int, text: str):
     requests.post(f"{TELEGRAM_API_URL}/sendMessage", json={
@@ -36,37 +44,29 @@ async def webhook(request: Request):
     data = await request.json()
     update = Update.de_json(data, None)
 
+    # Главное меню при /start
+    if user_text == "/start":
+        keyboard = [
+            [InlineKeyboardButton("ℹ️ Инфо", callback_data="info")],
+            [InlineKeyboardButton("💬 Спросить LLM", callback_data="ask_llm")],
+            [InlineKeyboardButton("🌍 Открыть сайт", url="https://python.org")]
+        ]
+        reply_markup = {"inline_keyboard": [[
+            {"text": "ℹ️ Инфо", "callback_data": "info"}
+        ], [
+            {"text": "💬 Спросить LLM", "callback_data": "ask_llm"}
+        ], [
+            {"text": "🌍 Открыть сайт", "url": "https://python.org"}
+        ]]}
+        send_message(chat_id, "Добро пожаловать! Выберите опцию:", reply_markup=reply_markup)
+        return {"ok": True}
+
     if update.message and update.message.text:
         user_text = update.message.text
         chat_id = update.message.chat.id
         resp = llm.invoke(user_text)
-        reply_text = resp.content  # resp.content
+        reply_text = resp.content
 
         send_message(chat_id, reply_text)
-
-        # Запрос в laozhang.ai
-        # headers = {
-        #     "Authorization": f"Bearer {LAOZHANG_API_KEY}",#LAOZHANG_API_KEY
-        #     "Content-Type": "application/json"
-        # }
-        # payload = {
-        #     "model": LAOZHANG_MODEL,#LAOZHANG_MODEL
-        #     "messages": [
-        #         {"role": "system", "content": "You are a helpful assistant."},
-        #         {"role": "user", "content": user_text}
-        #     ]
-        # }
-
-        # try:
-        #     resp = requests.post(LAOZHANG_API_URL, headers=headers, json=payload),#LAOZHANG_API_URL
-        #     if resp.status_code == 200:
-        #         data = resp.json()
-        #         reply_text = data["choices"][0]["message"]["content"]
-        #     else:
-        #         reply_text = f"Ошибка API: {resp.text}"
-        # except Exception as e:
-        #     reply_text = f"Ошибка запроса: {e}"
-
-        # Запрос в amvera
 
     return {"ok": True}
