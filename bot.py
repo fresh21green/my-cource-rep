@@ -44,23 +44,6 @@ async def webhook(request: Request):
     data = await request.json()
     update = Update.de_json(data, None)
 
-    # Главное меню при /start
-    if user_text == "/start":
-        keyboard = [
-            [InlineKeyboardButton("ℹ️ Инфо", callback_data="info")],
-            [InlineKeyboardButton("💬 Спросить LLM", callback_data="ask_llm")],
-            [InlineKeyboardButton("🌍 Открыть сайт", url="https://python.org")]
-        ]
-        reply_markup = {"inline_keyboard": [[
-            {"text": "ℹ️ Инфо", "callback_data": "info"}
-        ], [
-            {"text": "💬 Спросить LLM", "callback_data": "ask_llm"}
-        ], [
-            {"text": "🌍 Открыть сайт", "url": "https://python.org"}
-        ]]}
-        send_message(chat_id, "Добро пожаловать! Выберите опцию:", reply_markup=reply_markup)
-        return {"ok": True}
-
     if update.message and update.message.text:
         user_text = update.message.text
         chat_id = update.message.chat.id
