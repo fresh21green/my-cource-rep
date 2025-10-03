@@ -40,7 +40,7 @@ async def webhook(request: Request):
         user_text = update.message.text
         chat_id = update.message.chat.id
         resp = llm.invoke(user_text)
-        reply_text = str(resp)  # resp.content
+        reply_text = resp.content  # resp.content
 
         send_message(chat_id, reply_text)
 
