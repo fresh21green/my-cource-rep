@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Поддерживаемые модели: llama8b, llama70b, gpt-4.1, gpt-5
-llm = AmveraLLM(model="llama70b", api_token=os.getenv("AMVERA_API_KEY"))
+llm = AmveraLLM(model="gpt-4.1", api_token=os.getenv("AMVERA_API_KEY"))
 
 
 
